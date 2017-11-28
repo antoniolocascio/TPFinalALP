@@ -2,7 +2,7 @@ name:                TPFinalALP
 version:             0.1.0.0
 -- synopsis:
 -- description:
-homepage:            https://github.com/githubuser/TPFinalALP#readme
+homepage:            https://github.com/antoniolocascio/TPFinalALP#readme
 license:             BSD3
 license-file:        LICENSE
 author:              Antonio Locascio
@@ -62,4 +62,4 @@ test-suite TPFinalALP-test
 
 source-repository head
   type:     git
-  location: https://github.com/githubuser/TPFinalALP
+  location: https://github.com/antoniolocascio/TPFinalALP
