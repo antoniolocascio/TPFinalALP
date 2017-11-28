@@ -1,0 +1,65 @@
+name:                TPFinalALP
+version:             0.1.0.0
+-- synopsis:
+-- description:
+homepage:            https://github.com/githubuser/TPFinalALP#readme
+license:             BSD3
+license-file:        LICENSE
+author:              Antonio Locascio
+maintainer:          antonio.locascio1@gmail.com
+category:            Haskell
+build-type:          Simple
+extra-source-files:  README.md
+cabal-version:       >=1.10
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     Lib,
+                       BlurImage,
+                       Threshold,
+                       TestMain
+  build-depends:       base >= 4.7 && < 5
+                    ,  JuicyPixels >=3.2.8.1
+                    ,  data-default >=0.7.1.1
+                    ,  inline-c >=0.5.5.5
+                    ,  inline-c-cpp >=0.1
+                    ,  linear >=1.20.4
+                    ,  repa >=3.4.0.2
+                    ,  opencv >=0.0.2.0
+                    ,  mtl
+                    ,  bytestring >=0.10.8.1
+                    ,  primitive >=0.6.2.0
+                    ,  vector >=0.12.0.1
+  default-language:    Haskell2010
+
+executable TPFinalALP-exe
+  hs-source-dirs:      app
+  main-is:             Main.hs
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  build-depends:       base
+                     , TPFinalALP
+  default-language:    Haskell2010
+
+test-suite TPFinalALP-test
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Spec.hs
+  build-depends:       base
+                    ,  TPFinalALP
+                    ,  JuicyPixels >=3.2.8.1
+                    ,  data-default >=0.7.1.1
+                    ,  inline-c >=0.5.5.5
+                    ,  inline-c-cpp >=0.1
+                    ,  linear >=1.20.4
+                    ,  repa >=3.4.0.2
+                    ,  opencv >=0.0.2.0
+                    ,  mtl
+                    ,  bytestring >=0.10.8.1
+                    ,  primitive >=0.6.2.0
+                    ,  vector >=0.12.0.1
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  default-language:    Haskell2010
+
+source-repository head
+  type:     git
+  location: https://github.com/githubuser/TPFinalALP
