@@ -47,7 +47,6 @@ maint = do
 data Estructura = Rectangulo (V.Vector Estructura) | Circulo Bool Double | Nada 
 type Punto = (Int32, Int32)
 data Contorno = C Double (V.Vector Punto) (V.Vector Contorno)
---data Forma = Rect | Circulo | Nada deriving Show
 
 instance Show Estructura where
   show (Rectangulo hijos) = "Rectangle " L.++ show hijos
@@ -137,7 +136,6 @@ aEstructura img c@(C _ puntos hijos) =  let n = V.length puntos
  
 meanIntensityCont :: (1 GHC.TypeLits.<= channels, channels GHC.TypeLits.<= 4) =>
   M.Mat (CV.S [height, width]) (CV.S channels) depth -> Contorno -> Double
---meanIntensityCont :: M.Mat (CV.S [CV.D, CV.D]) CV.D CV.D -> Contorno -> CV.Scalar
 meanIntensityCont img cnt = let v = fst $ CV.exceptError (CV.meanStdDev (CV.exceptError $ cropFitCont img cnt) Nothing)
                                 (V4 x _ _ _) = (CV.fromScalar v) :: V4 Double
                             in x
@@ -145,7 +143,6 @@ meanIntensityCont img cnt = let v = fst $ CV.exceptError (CV.meanStdDev (CV.exce
 
 cropFitCont :: (1 GHC.TypeLits.<= channels, channels GHC.TypeLits.<= 4) =>
   M.Mat (CV.S [height, width]) (CV.S channels) depth -> Contorno -> CV.CvExcept (CV.Mat (CV.S [CV.D, CV.D]) (CV.S channels) depth)
---cropFitCont :: M.Mat (CV.S [CV.D, CV.D]) CV.D CV.D -> Contorno -> CV.CvExcept (M.Mat (CV.S [CV.D, CV.D]) CV.D CV.D) 
 cropFitCont img cont = CV.matSubRect img (fitRect $ cPuntos cont)
 
 fitRect :: V.Vector Punto -> CV.Rect2i
@@ -158,16 +155,7 @@ fitRect puntos =  let
                     maxy = V.maximum ys
                     h = maxy - miny
                     w = maxx - minx
-
-                  --in "y: " L.++ show miny L.++ " x: " L.++ show minx
                   in CV.toRect $ CV.HRect (V2 minx miny) (V2 h w)
-
-{-withMatM (h ::: 2 * w ::: Z)
-             (Proxy :: Proxy 3)
-             (Proxy :: Proxy Word8)
-             white $ \imgM -> do-}
-
-
 
 
 
