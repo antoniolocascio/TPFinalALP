@@ -25,25 +25,44 @@ import Data.List as L
 import GHC.TypeLits
 import AST
 import Parser
+import Eval
 
 maint :: IO ()
 maint = do 
-          putStr "Input: "
-          filepath <- getLine
-          img <- CV.imdecode CV.ImreadGrayscale <$> B.readFile filepath 
-          blurred <- blurImage ((CV.exceptError $ M.coerceMat img) :: M.Mat (CV.S [ CV.D, CV.D]) (CV.S 1) (CV.S Word8))
-          (thresh, _) <- threshold ((CV.exceptError $ M.coerceMat blurred) :: CV.Mat (CV.S [CV.D, CV.D]) (CV.S 1) (CV.S Word8))
-          t' <- Mutable.thaw thresh
-          cnts <- CV.findContours CV.ContourRetrievalTree CV.ContourApproximationSimple t'
-          let c = (V.map removeInner (ignoreOutmost (aContorno  (V.head cnts)))) 
-          --putStrLn $ show cnts
-          --putStrLn $ show (V.map removeSmaller c)
-          putStrLn $ show (V.reverse (V.map (aEstructura img) (V.map removeSmaller c)))
-          --putStrLn $ show (meanIntensityCont ((CV.exceptError $ M.coerceMat img) :: 
-          --                   M.Mat (CV.S [CV.D, CV.D]) (CV.S 1) CV.D) (V.head c)) 
-          --CV.withWindow "test" $ \window -> do
-          --CV.imshow window (CV.exceptError $ cropFitCont img (V.head c)) 
-          --void $ CV.waitKey 10000
+            putStr "Image: "
+            filepathImg <- getLine
+            putStr "Document: "
+            filepathDoc <- getLine
+            estr <- scanImage filepathImg
+            docText <- readFile "test.txt"
+            case parseDoc filepathDoc docText of
+              Left e    -> print e
+              Right doc -> print $ eval doc estr
+          
+
+
+
+
+
+
+
+
+          -- putStr "Input: "
+          -- filepath <- getLine
+          -- img <- CV.imdecode CV.ImreadGrayscale <$> B.readFile filepath 
+          -- blurred <- blurImage ((CV.exceptError $ M.coerceMat img) :: M.Mat (CV.S [ CV.D, CV.D]) (CV.S 1) (CV.S Word8))
+          -- (thresh, _) <- threshold ((CV.exceptError $ M.coerceMat blurred) :: CV.Mat (CV.S [CV.D, CV.D]) (CV.S 1) (CV.S Word8))
+          -- t' <- Mutable.thaw thresh
+          -- cnts <- CV.findContours CV.ContourRetrievalTree CV.ContourApproximationSimple t'
+          -- let c = (V.map removeInner (ignoreOutmost (aContorno  (V.head cnts)))) 
+          -- --putStrLn $ show cnts
+          -- --putStrLn $ show (V.map removeSmaller c)
+          -- putStrLn $ show (V.reverse (V.map (aEstructura img) (V.map removeSmaller c)))
+          -- --putStrLn $ show (meanIntensityCont ((CV.exceptError $ M.coerceMat img) :: 
+          -- --                   M.Mat (CV.S [CV.D, CV.D]) (CV.S 1) CV.D) (V.head c)) 
+          -- --CV.withWindow "test" $ \window -> do
+          -- --CV.imshow window (CV.exceptError $ cropFitCont img (V.head c)) 
+          -- --void $ CV.waitKey 10000
 
 
 -- data Estructura = Rectangulo (V.Vector Estructura) | Circulo Bool Double | Nada 
@@ -127,7 +146,7 @@ removeSmaller (C a puntos hijos) = C a puntos (V.filter (\c -> (cArea c) > minAr
 aEstructura :: M.Mat (CV.S [CV.D, CV.D]) CV.D CV.D -> Contorno -> Estructura
 aEstructura img c@(C _ puntos hijos) =  let n = V.length puntos 
                                         in if n < 4 then Nada
-                                           else if n == 4 then Rectangulo (V.reverse (V.map (aEstructura img) hijos)) 
+                                           else if n == 4 then Rectangulo (V.toList (V.reverse (V.map (aEstructura img) hijos))) 
                                            else Circulo marked intesnsity
 
   where
@@ -159,14 +178,14 @@ fitRect puntos =  let
                     w = maxx - minx
                   in CV.toRect $ CV.HRect (V2 minx miny) (V2 h w)
 
-scanImage :: String -> IO (Maybe Estructura)
+scanImage :: String -> IO Estructura
 scanImage filepath = do img <- CV.imdecode CV.ImreadGrayscale <$> B.readFile filepath 
                         blurred <- blurImage ((CV.exceptError $ M.coerceMat img) :: M.Mat (CV.S [ CV.D, CV.D]) (CV.S 1) (CV.S Word8))
                         (thresh, _) <- threshold ((CV.exceptError $ M.coerceMat blurred) :: CV.Mat (CV.S [CV.D, CV.D]) (CV.S 1) (CV.S Word8))
                         t' <- Mutable.thaw thresh
                         cnts <- CV.findContours CV.ContourRetrievalTree CV.ContourApproximationSimple t'
                         let c = (V.map removeInner (ignoreOutmost (aContorno  (V.head cnts)))) 
-                        return $ Just (V.head (V.map (aEstructura img) (V.map removeSmaller c)))
+                        return $ V.head (V.map (aEstructura img) (V.map removeSmaller c))
 runParser :: IO ()
 runParser = 
     do

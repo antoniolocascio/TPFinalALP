@@ -32,9 +32,7 @@ docParser = do  reserved docl "section"
 
 subParser :: Parser Subsection
 subParser = do  options <- many1 optParser
-                (do  reserved docl "multiple"
-                     reservedOp docl ":"
-                     allowed <- restrParser
+                (do  allowed <- restrParser
                      reservedOp docl ";"
                      return (Options allowed options)
                  <|> return (Options False options))
@@ -51,10 +49,10 @@ optParser = do  reserved docl "option"
 restrParser :: Parser Restriction
 restrParser = do  reserved docl "multiple"
                   reservedOp docl ":"
-                  do reserved docl "yes"
-                     return False
-                  <|> do reserved docl "no"
-                         return True
+                  (do reserved docl "yes"
+                      return False
+                   <|> do reserved docl "no"
+                          return True)
 
 
 ------------------------------------

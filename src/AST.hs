@@ -4,7 +4,7 @@ import Data.Vector as V
 import GHC.Int (Int32)
 import Data.List as L
 
-data Estructura = Rectangulo (V.Vector Estructura) | Circulo Bool Double | Nada 
+data Estructura = Rectangulo [Estructura] | Circulo Bool Double | Nada 
 type Punto = (Int32, Int32)
 data Contorno = C Double (V.Vector Punto) (V.Vector Contorno)
 

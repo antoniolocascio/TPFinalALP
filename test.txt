@@ -8,3 +8,5 @@ section: "Titulo";
   section: "Subt2";
   option: "a";
   option: "b";
+  option: "c";
+  option: "d";
