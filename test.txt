@@ -1,0 +1,10 @@
+section: "Titulo";
+  section: "Subt 1";
+  option: "a";
+  option: "b";
+  option: "c";
+  multiple: no;
+
+  section: "Subt2";
+  option: "a";
+  option: "b";

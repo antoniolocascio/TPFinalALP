@@ -23,6 +23,8 @@ import Linear.V2
 import GHC.Int (Int32)
 import Data.List as L
 import GHC.TypeLits
+import AST
+import Parser
 
 maint :: IO ()
 maint = do 
@@ -44,18 +46,18 @@ maint = do
           --void $ CV.waitKey 10000
 
 
-data Estructura = Rectangulo (V.Vector Estructura) | Circulo Bool Double | Nada 
-type Punto = (Int32, Int32)
-data Contorno = C Double (V.Vector Punto) (V.Vector Contorno)
+-- data Estructura = Rectangulo (V.Vector Estructura) | Circulo Bool Double | Nada 
+-- type Punto = (Int32, Int32)
+-- data Contorno = C Double (V.Vector Punto) (V.Vector Contorno)
 
-instance Show Estructura where
-  show (Rectangulo hijos) = "Rectangle " L.++ show hijos
-  show (Circulo True _) = "Marked Circle"
-  show (Circulo False _) = "Unmarked Circle"
-  show Nada = "Nothing" 
+-- instance Show Estructura where
+--   show (Rectangulo hijos) = "Rectangle " L.++ show hijos
+--   show (Circulo True _) = "Marked Circle"
+--   show (Circulo False _) = "Unmarked Circle"
+--   show Nada = "Nothing" 
 
-instance Show Contorno where
-  show (C a puntos hijos) = "C: " L.++ "A: " L.++ show a L.++ " " L.++ show puntos L.++ "\n Hijos: " L.++ show hijos 
+-- instance Show Contorno where
+--   show (C a puntos hijos) = "C: " L.++ "A: " L.++ show a L.++ " " L.++ show puntos L.++ "\n Hijos: " L.++ show hijos 
 
 ignoreOutmost :: Contorno -> V.Vector Contorno
 ignoreOutmost cnt | (V.head (cPuntos cnt)) == (0, 0) = cHijos cnt
@@ -157,8 +159,21 @@ fitRect puntos =  let
                     w = maxx - minx
                   in CV.toRect $ CV.HRect (V2 minx miny) (V2 h w)
 
-
-
+scanImage :: String -> IO (Maybe Estructura)
+scanImage filepath = do img <- CV.imdecode CV.ImreadGrayscale <$> B.readFile filepath 
+                        blurred <- blurImage ((CV.exceptError $ M.coerceMat img) :: M.Mat (CV.S [ CV.D, CV.D]) (CV.S 1) (CV.S Word8))
+                        (thresh, _) <- threshold ((CV.exceptError $ M.coerceMat blurred) :: CV.Mat (CV.S [CV.D, CV.D]) (CV.S 1) (CV.S Word8))
+                        t' <- Mutable.thaw thresh
+                        cnts <- CV.findContours CV.ContourRetrievalTree CV.ContourApproximationSimple t'
+                        let c = (V.map removeInner (ignoreOutmost (aContorno  (V.head cnts)))) 
+                        return $ Just (V.head (V.map (aEstructura img) (V.map removeSmaller c)))
+runParser :: IO ()
+runParser = 
+    do
+      s <- readFile "test.txt"
+      case parseDoc "test.txt" s of
+        Left error -> print error
+        Right t    -> print (t)
 
 
 
