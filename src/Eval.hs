@@ -4,8 +4,8 @@ import AST
 --import Data.List as L
 
 data Result = Sect [Result] | Ans [Res] deriving Show
-data Res = Marked | Unmarked deriving Show
-
+--data Res = Marked | Unmarked deriving Show
+type Res = Bool
 type Error = String
 type ErrorResult = Either Error Result
 
@@ -21,17 +21,20 @@ eval (Section t (Options res opts)) (Rectangulo subestr) = do
   results <- evalRes opts subestr
   return $ Sect [Ans results]
 eval (Section t (Subs docs)) (Rectangulo subestr) = do
-  results <- mapM (\(x, y) -> eval x y) (zip docs subestr)
-  return $ Sect results
+  -- Arreglar esto! Zip elimina el resto
+  if length docs == length subestr 
+    then  do results <- mapM (\(x, y) -> eval x y) (zip docs subestr)
+             return $ Sect results
+    else raise "Structure doesn't match"
 eval _ _ = raise "Structure doesn't match"
 
 evalRes :: [Option] -> [Estructura] -> Either Error [Res]
-evalRes [opt] [Circulo mked _] = return $ [toRes mked]
+evalRes [opt] [Circulo mked _] = return $ [mked]
 evalRes (opt:opts) ((Circulo mked _) : strs) = do
   results <- evalRes opts strs
-  return $ (toRes mked) : results
+  return $ mked : results
 evalRes _ _ = Left "Options don't match"
 
-toRes :: Bool -> Res
-toRes True  = Marked
-toRes False = Unmarked 
+-- toRes :: Bool -> Res
+-- toRes True  = Marked
+-- toRes False = Unmarked 
