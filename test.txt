@@ -3,7 +3,7 @@ section: "Titulo";
   option: "a";
   option: "b";
   option: "c";
-  multiple: no;
+  multiple: yes;
 
   section: "Subt2";
   option: "a";
