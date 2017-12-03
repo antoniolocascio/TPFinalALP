@@ -37,7 +37,9 @@ maint = do
             docText <- readFile "test.txt"
             case parseDoc filepathDoc docText of
               Left e    -> print e
-              Right doc -> print $ eval doc estr
+              Right doc -> case eval doc estr of 
+                            Left e -> print e
+                            Right r -> print $ flattenResult r 
           
 
 
