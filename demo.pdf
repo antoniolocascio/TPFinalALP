@@ -1,0 +1,84 @@
+%PDF-1.5
+1 0 obj
+<<
+/Contents 2 0 R
+/MediaBox [0 0 2480 3508 ]
+/Parent 4 0 R
+/Resources <<
+>>
+/Type /Page
+>>
+endobj
+
+2 0 obj
+<<
+/Length 3 0 R
+>>
+stream
+
+0.00000 0.00000 0.00000 RG
+10.00000 w
+0.00000 0.00000 m
+0.00000 400.00000 l
+400.00000 400.00000 l
+400.00000 0.00000 l
+h
+S
+100.00000 100.00000 m
+300.00000 0.00000 0.00000 0.00000 re
+S
+endstream
+endobj
+
+3 0 obj
+183
+endobj
+
+4 0 obj
+<<
+/Count 1
+/Kids [1 0 R ]
+/Type /Pages
+>>
+endobj
+
+5 0 obj
+<<
+/PageLayout /SinglePage
+/PageMode /UseNone
+/Pages 4 0 R
+/Type /Catalog
+/ViewerPreferences <<
+/CenterWindow false
+/DisplayDocTitle false
+/FitWindow false
+/HideMenubar false
+/HideToolbar false
+/HideWindowUI false
+/NonFullScreenPageMode /UseNone
+>>
+>>
+endobj
+
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000117 00000 n 
+0000000354 00000 n 
+0000000374 00000 n 
+0000000433 00000 n 
+
+trailer
+<<
+/Info <<
+/Author (alpheccar)
+/Producer (HPDF - The Haskell PDF Library)
+/Subject ()
+>>
+/Root 5 0 R
+/Size 6
+>>
+startxref
+701
+%%EOF

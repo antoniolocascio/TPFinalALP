@@ -21,7 +21,7 @@ main =  do
           case parseDoc filepathDoc docText of
              Left e    -> print e
              Right doc -> case eval doc estr of 
-                           Left e -> print e
+                           Left e -> putStrLn $ "Error: " ++ e
                            Right r -> print $ flattenResult r 
 
 
