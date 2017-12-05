@@ -64,8 +64,13 @@ makeSubsections (doc : docs) upb leb h w = do
   makeSubsections docs (upb - h - padding) leb h w
 
 makeOptions :: [Option] -> PDFFloat -> PDFFloat -> PDFFloat -> PDFFloat -> Draw ()
-makeOptions [] _ _ _ _ = return ()
+makeOptions [opt] upb leb h w = makeOption opt upb leb h w True
 makeOptions (opt : opts) upb leb h w = do
+  makeOption opt upb leb h w False
+  makeOptions opts (upb - h - padding) leb h w
+
+makeOption :: Option -> PDFFloat -> PDFFloat -> PDFFloat -> PDFFloat -> Bool -> Draw ()
+makeOption opt upb leb h w last = do
   displayFormattedText  (Rectangle (leb :+ (upb - h)) ((leb + w) :+ upb)) 
                         NormalParagraph 
                         (Font (PDFFont Helvetica fontSize) black black) $ do 
@@ -74,11 +79,18 @@ makeOptions (opt : opts) upb leb h w = do
   strokeColor black
   setWidth lineW
   stroke $ Circle (leb + w + 2 * padding) (upb - (circleSize)) (min circleSize (2*h))
-  makeOptions opts (upb - h - padding) leb h w
-
-
-
-
+  if last 
+    then return ()
+    else do setWidth (lineW / 3)
+            strokeColor black
+            setDash $ DashPattern [25] 25
+            let ypos = (upb - h - padding / 3)
+            beginPath ((leb + padding):+ypos)
+            addLineToPath ((leb + w + padding):+ypos)
+            closePath
+            strokePath
+            setNoDash
+            
 
 
 

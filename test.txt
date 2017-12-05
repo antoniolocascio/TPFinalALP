@@ -11,14 +11,12 @@ section: "Titulo";
   option: "c";
   option: "d";
 
-  section: "Subt 3";
+  section: "Subt 1";
   option: "a";
   option: "b";
   option: "c";
-  multiple: yes;
 
-  section: "Subt 4";
+  section: "Subt 1";
   option: "a";
   option: "b";
   option: "c";
-  multiple: yes;
