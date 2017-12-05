@@ -26,6 +26,7 @@ import GHC.TypeLits
 import AST
 import Parser
 import Eval
+import PDFMaker (makePDF)
 
 maint :: IO ()
 maint = do 
@@ -196,10 +197,12 @@ runParser =
         Left error -> print error
         Right t    -> print (t)
 
-
-
-
-
+pdf :: IO ()
+pdf = do
+        docText <- readFile "test.txt"
+        case parseDoc "test.txt" docText of
+             Left e    -> print e
+             Right doc -> makePDF doc "test.pdf"
 
 
 
