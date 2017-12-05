@@ -3,6 +3,18 @@ module PDFMaker where
 import AST
 import Graphics.PDF
 
+padding :: PDFFloat
+padding = 100
+
+lineW = 10
+fontSize = 40
+circleSize = 35
+
+upperBound = 3508
+lowerBound = 0
+leftBound = 0
+rightBound = 2480
+
 makePDF :: Document -> String -> IO ()
 makePDF doc name = do
   let rect = PDFRect 0 0 2480 3508
@@ -61,7 +73,7 @@ makeOptions (opt : opts) upb leb h w = do
                             txt $ opt
   strokeColor black
   setWidth lineW
-  stroke $ Circle (leb + w + 2 * padding) (upb - (circleSize)) (min circleSize h)
+  stroke $ Circle (leb + w + 2 * padding) (upb - (circleSize)) (min circleSize (2*h))
   makeOptions opts (upb - h - padding) leb h w
 
 
