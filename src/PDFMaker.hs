@@ -7,6 +7,7 @@ padding :: PDFFloat
 padding = 100
 
 lineW = 10
+fontSize :: Int
 fontSize = 40
 circleSize = 35
 
@@ -25,14 +26,15 @@ makePDF doc name = do
 makeDocument :: PDFReference PDFPage -> Document -> PDF () 
 makeDocument page doc = drawWithPage page $ makeSection doc (upperBound - padding) (lowerBound + padding) (leftBound + padding) (rightBound - padding)
 
--- Falta imprimir titulo, restr
 makeSection :: Document -> PDFFloat -> PDFFloat -> PDFFloat -> PDFFloat -> Draw ()
 makeSection (Section t (Options res opts)) upb lob leb rib = do
-  let lowerLeft = (leb) :+ (lob )
-  let upperRight = (rib ) :+ (upb)
+  let lowerLeft = leb :+ lob 
+  let upperRight = rib :+ upb
   strokeColor black
   setWidth lineW
   stroke $ Rectangle lowerLeft upperRight
+  makeTitle t leb (upb + padding / 4)
+  makeRestriction res (leb + padding / 4) (upb - (fromIntegral fontSize)) 
   let nopts = (fromIntegral $ length opts) :: PDFFloat
   let totH = (upb - lob)
   let optH = (totH - padding * (nopts + 1)) / nopts
@@ -43,8 +45,8 @@ makeSection (Section t (Options res opts)) upb lob leb rib = do
   makeOptions opts firstUpb firstLeb optH optW
 
 makeSection (Section t (Subs subs)) upb lob leb rib = do
-  let lowerLeft = (leb) :+ (lob )
-  let upperRight = (rib ) :+ (upb)
+  let lowerLeft = leb :+ lob
+  let upperRight = rib :+ upb
   strokeColor black
   setWidth lineW
   stroke $ Rectangle lowerLeft upperRight
@@ -56,6 +58,22 @@ makeSection (Section t (Subs subs)) upb lob leb rib = do
   let firstUpb = upb - padding 
   let firstLeb = leb + padding
   makeSubsections subs firstUpb firstLeb subH subW
+
+makeRestriction :: Restriction -> PDFFloat -> PDFFloat -> Draw ()
+makeRestriction res x y = makeText (showRestr res) x y 
+  where
+    showRestr True  = "Mark only one option"
+    showRestr False = "Mark one or more"
+
+makeTitle :: Title -> PDFFloat -> PDFFloat -> Draw ()
+makeTitle t x y = makeText t x y
+
+makeText :: String -> PDFFloat -> PDFFloat -> Draw ()
+makeText str x y = drawText $ do
+         setFont (PDFFont Helvetica fontSize)
+         textStart x y
+         renderMode FillText
+         displayText $ toPDFString str
 
 makeSubsections :: [Document] -> PDFFloat -> PDFFloat -> PDFFloat -> PDFFloat -> Draw ()
 makeSubsections [] _ _ _ _ = return ()
@@ -75,10 +93,10 @@ makeOption opt upb leb h w last = do
                         NormalParagraph 
                         (Font (PDFFont Helvetica fontSize) black black) $ do 
                           paragraph $ do
-                            txt $ opt
+                                        txt $ opt
   strokeColor black
   setWidth lineW
-  stroke $ Circle (leb + w + 2 * padding) (upb - (circleSize)) (min circleSize (2*h))
+  stroke $ Circle (leb + w + 2 * padding) (upb - (h / 2)) (min circleSize (2*h))
   if last 
     then return ()
     else do setWidth (lineW / 3)
