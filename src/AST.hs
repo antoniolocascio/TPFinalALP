@@ -21,7 +21,6 @@ instance Show Contorno where
 
 data Document = Section Title Subsection deriving Show
 data Subsection = Subs [Document] | Options Restriction [Option] deriving Show
---data Restriction = OnlyOne | Multiple deriving Show
 type Restriction = Bool --True -> solo uno
 type Option = String 
 type Title = String

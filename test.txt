@@ -1,22 +1,23 @@
 section: "";
-  section: "Subt 1";
-  option: "a";
-  option: "b";
-  option: "c";
+  section: "Section 1.1";
+  option: "a)";
+  option: "b)";
+  option: "c)";
   multiple: yes;
 
-  section: "Subt 2";
-  option: "a";
-  option: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
-  option: "c";
-  option: "d";
+  section: "Section 1.2";
+  option: "a)";
+  option: "b) Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
+  option: "c)";
+  option: "d)";
 
-  section: "Subt 3";
-  option: "a";
-  option: "b";
-  option: "c";
+  section: "Section 1.3";
+  option: "a)";
+  option: "b)";
+  option: "c)";
 
-  section: "Subt 4";
-  option: "a";
-  option: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
-  option: "c";
+  section: "Section 1.4";
+  option: "a)";
+  option: "b) Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
+  option: "c)";
+  multiple: no;
