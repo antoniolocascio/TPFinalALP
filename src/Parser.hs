@@ -1,6 +1,7 @@
 module Parser where
 
 import Text.ParserCombinators.Parsec
+import Text.ParserCombinators.Parsec.Error
 import Text.Parsec.Token
 import Text.Parsec.Language (emptyDef)
 import AST

@@ -24,3 +24,10 @@ data Subsection = Subs [Document] | Options Restriction [Option] deriving Show
 type Restriction = Bool --True -> solo uno
 type Option = String 
 type Title = String
+
+data Result = Sect [Result] | Ans [Res] deriving Show
+type Res = Bool
+type Error = String
+type ErrorResult = Either Error Result
+data SectNum = Num Int | Pnt SectNum SectNum 
+type FlatResult = [(SectNum, [Int])]

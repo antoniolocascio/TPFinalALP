@@ -3,13 +3,6 @@ module Eval where
 import AST
 import Data.List
 
-data Result = Sect [Result] | Ans [Res] deriving Show
-type Res = Bool
-type Error = String
-type ErrorResult = Either Error Result
-data SectNum = Num Int | Pnt SectNum SectNum 
-type FlatResult = [(SectNum, [Int])]
-
 instance Show SectNum where
   show (Num n) = show n
   show (Pnt e1 e2) = (show e1) ++ "." ++ (show e2)  

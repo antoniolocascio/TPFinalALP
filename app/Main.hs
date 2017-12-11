@@ -25,7 +25,7 @@ makeDoc = do
             pdfName <- prompt "Document name: "
             docText <- readFile filepathDoc
             case parseDoc filepathDoc docText of
-              Left e    -> print e
+              Left e    -> putStrLn $ "Error: " ++ (show e)
               Right doc -> do makePDF doc pdfName
                               putStrLn "Done!"
 
