@@ -3,7 +3,7 @@ section: "";
     option: "a)";
     option: "b)";
     option: "c)";
-    option: "d)";
+    //option: "d)";
     multiple: yes;
 
   section: "Section 1.2";
@@ -16,11 +16,11 @@ section: "";
     option: "a)";
     option: "b)";
     option: "c)";
-    option: "d)";
+    //option: "d)";
 
   section: "Section 1.4";
     option: "a)";
     option: "b) Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
     option: "c)";
-    option: "d)";
+    //option: "d)";
     multiple: no;

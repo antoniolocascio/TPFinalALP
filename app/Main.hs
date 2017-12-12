@@ -5,6 +5,7 @@ import Eval (eval, flattenResult)
 import System.IO 
 import PDFMaker (makePDF)
 import ImageRec (scanImage)
+import AST (showFlatResult)
 
 
 -- Hacer bien
@@ -39,7 +40,7 @@ scan =  do
              Left e    -> print e
              Right doc -> case eval doc estr of 
                            Left e -> putStrLn $ "Error: " ++ e
-                           Right r -> print $ flattenResult r 
+                           Right r -> putStrLn $ showFlatResult (flattenResult r) 
 
 --Stackoverflow
 prompt :: String -> IO String

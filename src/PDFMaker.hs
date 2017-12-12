@@ -9,8 +9,9 @@ padding = 100
 lineW = 10
 fontSize :: Int
 fontSize = 40
-circleSize = 35
+circleSize = 40
 
+-- A4 default size
 upperBound = 3508
 lowerBound = 0
 leftBound = 0

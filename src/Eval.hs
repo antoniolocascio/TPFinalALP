@@ -3,16 +3,6 @@ module Eval where
 import AST
 import Data.List
 
-instance Show SectNum where
-  show (Num n) = show n
-  show (Pnt e1 e2) = (show e1) ++ "." ++ (show e2)  
-
-initialSectNum :: SectNum
-initialSectNum = Num 1
-
-appendSN :: SectNum -> Int -> SectNum
-appendSN sn n = Pnt sn (Num n)
-
 raise :: String -> Either Error a
 raise e = Left e
 
@@ -44,10 +34,10 @@ evalRes (opt:opts) ((Circulo mked _) : strs) t = do
 evalRes _ _ t = raise $ "Options don't match in section " ++ t ++ "."
 
 flattenResult :: Result -> FlatResult
-flattenResult res = flattenResult' res initialSectNum
+flattenResult res = flattenResult' res [] --initialSectNum
   where
     flattenResult' :: Result -> SectNum -> FlatResult
-    flattenResult' (Sect subsects) sn = concat $ map (\(s, sn) -> flattenResult' s sn) (zip subsects [appendSN sn i | i <- [1..(length subsects)]])
+    flattenResult' (Sect subsects) sn = concat $ map (\(s, sn) -> flattenResult' s sn) (zip subsects [i : sn | i <- [1..(length subsects)]]) 
     flattenResult' (Ans results) sn = [(sn, findIndices id results)]
 
 
