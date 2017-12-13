@@ -20,21 +20,20 @@ docl = makeTokenParser (emptyDef   { commentStart  = "/*"
                                    , commentEnd    = "*/"
                                    , commentLine   = "//"
                                    , reservedNames = ["section", "multiple", "option", "yes", "no"]
-                                   , reservedOpNames = [":",";"]
+                                   , reservedOpNames = [":"]
                                    })
 
 docParser :: Parser Document
 docParser = do  reserved docl "section"
                 reservedOp docl ":"
                 title <- stringLiteral docl
-                reservedOp docl ";"
                 subsection <- subParser
                 return (Section title subsection)
 
 subParser :: Parser Subsection
 subParser = do  options <- many1 optParser
                 (do  allowed <- restrParser
-                     reservedOp docl ";"
+                     --reservedOp docl ";"
                      return (Options allowed options)
                  <|> return (Options False options))
             <|> do  subsections <- many1 docParser
@@ -44,7 +43,6 @@ optParser :: Parser Option
 optParser = do  reserved docl "option"
                 reservedOp docl ":"
                 str <- stringLiteral docl
-                reservedOp docl ";"
                 return str
 
 restrParser :: Parser Restriction

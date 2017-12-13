@@ -1,26 +1,26 @@
-section: "";
-  section: "Section 1.1";
-    option: "a)";
-    option: "b)";
-    option: "c)";
-    //option: "d)";
-    multiple: yes;
+section: ""
+  section: "Section 1.1"
+    option: "a)"
+    option: "b)"
+    option: "c)"
+    //option: "d)"
+    multiple: yes
 
-  section: "Section 1.2";
-    option: "a)";
-    option: "b) Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
-    option: "c)";
-    option: "d)";
+  section: "Section 1.2"
+    option: "a)"
+    option: "b) Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    option: "c)"
+    option: "d)"
 
-  section: "Section 1.3";
-    option: "a)";
-    option: "b)";
-    option: "c)";
-    //option: "d)";
+  section: "Section 1.3"
+    option: "a)"
+    option: "b)"
+    option: "c)"
+    //option: "d)"
 
-  section: "Section 1.4";
-    option: "a)";
-    option: "b) Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
-    option: "c)";
-    //option: "d)";
-    multiple: no;
+  section: "Section 1.4"
+    option: "a)"
+    option: "b) Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    option: "c)"
+    //option: "d)"
+    multiple: no

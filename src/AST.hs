@@ -36,7 +36,7 @@ type SectNum = [Int]
 type FlatResult = [(SectNum, [Int])] 
 
 showFlatResult :: FlatResult -> String
-showFlatResult fr = "Results :\n" L.++ showFlatResult' fr
+showFlatResult fr = "Results:\n" L.++ showFlatResult' fr
   where
     showFlatResult' [] = ""
     showFlatResult' ((sn, res):fr) = "Question " L.++ showDottedSN sn L.++ ": " L.++ show res L.++ "\n" L.++ showFlatResult' fr
