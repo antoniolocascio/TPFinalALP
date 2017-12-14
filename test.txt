@@ -5,18 +5,21 @@ section: ""
     option: "c)"
     //option: "d)"
     multiple: yes
+  //end
 
   section: "Section 1.2"
     option: "a)"
     option: "b) Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     option: "c)"
     option: "d)"
+  //end
 
   section: "Section 1.3"
     option: "a)"
     option: "b)"
     option: "c)"
     //option: "d)"
+  //end
 
   section: "Section 1.4"
     option: "a)"
@@ -24,3 +27,5 @@ section: ""
     option: "c)"
     //option: "d)"
     multiple: no
+  //end
+//end

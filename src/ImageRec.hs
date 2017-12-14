@@ -25,6 +25,8 @@ import Data.List as L
 import GHC.TypeLits
 import AST
 
+
+-- Catch
 -- Funciones principales
 scanImage :: String -> IO Estructura
 scanImage filepath = do img <- CV.imdecode CV.ImreadGrayscale <$> B.readFile filepath 
