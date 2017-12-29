@@ -16,38 +16,73 @@ totParser p = do
 
 -- Analizador de Tokens
 docl :: TokenParser u
-docl = makeTokenParser (emptyDef   { commentStart  = "/*"
-                                   , commentEnd    = "*/"
-                                   , commentLine   = "//"
-                                   , reservedNames = ["section", "multiple", "option", "yes", "no"]
-                                   , reservedOpNames = [":"]
+docl = makeTokenParser (emptyDef   { commentLine   = "#"
+                                   , reservedNames = ["page", "endpage", "section", "endsection", "multiple", "option", "yes", "no"] 
                                    })
 
+-- docParser :: Parser Document
+-- docParser = do  reserved docl "section"
+--                 reservedOp docl ":"
+--                 title <- stringLiteral docl
+--                 subsection <- subParser
+--                 return (Section title subsection)
+
+-- subParser :: Parser Subsection
+-- subParser = do  options <- many1 optParser
+--                 (do  allowed <- restrParser
+--                      --reservedOp docl ";"
+--                      return (Options allowed options)
+--                  <|> return (Options False options))
+--             <|> do  subsections <- many1 docParser
+--                     return (Subs subsections)
+
+-- optParser :: Parser Option
+-- optParser = do  reserved docl "option"
+--                 reservedOp docl ":"
+--                 str <- stringLiteral docl
+--                 return str
+
+-- restrParser :: Parser Restriction
+-- restrParser = do  reserved docl "multiple"
+--                   reservedOp docl ":"
+--                   (do reserved docl "yes"
+--                       return False
+--                    <|> do reserved docl "no"
+--                           return True)
+
+
+
 docParser :: Parser Document
-docParser = do  reserved docl "section"
-                reservedOp docl ":"
+docParser = many1 pageParser
+
+pageParser :: Parser Page
+pageParser = do reserved docl "page"
+                p <- sectParser
+                reserved docl "endpage"
+                return p
+
+sectParser :: Parser Page
+sectParser = do reserved docl "section"
                 title <- stringLiteral docl
                 subsection <- subParser
+                reserved docl "endsection"
                 return (Section title subsection)
 
 subParser :: Parser Subsection
 subParser = do  options <- many1 optParser
                 (do  allowed <- restrParser
-                     --reservedOp docl ";"
                      return (Options allowed options)
                  <|> return (Options False options))
-            <|> do  subsections <- many1 docParser
+            <|> do  subsections <- many1 sectParser
                     return (Subs subsections)
 
 optParser :: Parser Option
 optParser = do  reserved docl "option"
-                reservedOp docl ":"
                 str <- stringLiteral docl
                 return str
 
 restrParser :: Parser Restriction
 restrParser = do  reserved docl "multiple"
-                  reservedOp docl ":"
                   (do reserved docl "yes"
                       return False
                    <|> do reserved docl "no"

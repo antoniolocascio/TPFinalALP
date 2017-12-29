@@ -11,7 +11,6 @@ raise e = Left e
 --data Subsection = Subs [Document] | Options Restriction [Option] deriving Show
 
 eval :: Document -> Estructura -> ErrorResult
-
 eval (Section t (Options res opts)) (Rectangulo subestr) = do 
   results <- evalRes opts subestr t
   if res && (length (filter id results) > 1) 

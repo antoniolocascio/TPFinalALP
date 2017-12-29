@@ -1,31 +1,33 @@
-section: ""
-  section: "Section 1.1"
-    option: "a)"
-    option: "b)"
-    option: "c)"
-    //option: "d)"
-    multiple: yes
-  //end
+page
+  section ""
+    section "Section 1.1"
+      option "a)"
+      option "b)"
+      option "c)"
+      #option "d)"
+      multiple yes
+    endsection
 
-  section: "Section 1.2"
-    option: "a)"
-    option: "b) Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    option: "c)"
-    option: "d)"
-  //end
+    section "Section 1.2"
+      option "a)"
+      option "b) Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+      option "c)"
+      option "d)"
+    endsection
 
-  section: "Section 1.3"
-    option: "a)"
-    option: "b)"
-    option: "c)"
-    //option: "d)"
-  //end
+    section "Section 1.3"
+      option "a)"
+      option "b)"
+      option "c)"
+      #option "d)"
+    endsection
 
-  section: "Section 1.4"
-    option: "a)"
-    option: "b) Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    option: "c)"
-    //option: "d)"
-    multiple: no
-  //end
-//end
+    section "Section 1.4"
+      option "a)"
+      option "b) Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+      option "c)"
+      #option "d)"
+      multiple no
+    endsection
+  endsection
+endpage

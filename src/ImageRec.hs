@@ -54,9 +54,9 @@ removeSmaller (C a puntos hijos) = C a puntos (V.filter (\c -> (cArea c) > minAr
 -- Conversiones
 aEstructura :: M.Mat (CV.S [CV.D, CV.D]) CV.D CV.D -> Contorno -> Estructura
 aEstructura img c@(C _ puntos hijos) =  let n = V.length puntos 
-                                        in if n < 4 then Nada
-                                           else if n == 4 then Rectangulo (V.toList (V.reverse (V.map (aEstructura img) hijos))) 
-                                           else Circulo marked intesnsity
+                                        in if n == 4 
+                                          then Rectangulo (V.toList (V.reverse (V.map (aEstructura img) hijos))) 
+                                          else Circulo marked intesnsity
   where
     thresIntensity = 160 
     intesnsity = (meanIntensityCont ((CV.exceptError $ M.coerceMat img) :: 
