@@ -1,9 +1,9 @@
 module Main where
 
 import Parser (parseDoc)
-import Eval (eval, flattenResult)
+import Eval (eval, flattenResultList)
 import System.IO 
-import PDFMaker (makePDF)
+--import PDFMaker (makePDF)
 import ImageRec (scanImage)
 import AST (showFlatResult)
 
@@ -21,26 +21,29 @@ main = do
 
 
 makeDoc :: IO ()
-makeDoc = do
-            filepathDoc <- prompt "Document description: "
-            pdfName <- prompt "Document name: "
-            docText <- readFile filepathDoc
-            case parseDoc filepathDoc docText of
-              Left e    -> putStrLn $ "Error: " ++ (show e)
-              Right doc -> do makePDF doc pdfName
-                              putStrLn "Done!"
+makeDoc = undefined
+-- makeDoc = do
+--             filepathDoc <- prompt "Document description: "
+--             pdfName <- prompt "Document name: "
+--             docText <- readFile filepathDoc
+--             case parseDoc filepathDoc docText of
+--               Left e    -> putStrLn $ "Error: " ++ (show e)
+--               Right doc -> do makePDF doc pdfName
+--                               putStrLn "Done!"
 
 scan :: IO ()
 scan =  do 
-          filepathImg <- prompt "Image: "
+          input <- prompt "Image/s: "
           filepathDoc <- prompt "Document: "
-          estr <- scanImage filepathImg
+
+          let imgPaths = words input
+          struct <- mapM scanImage imgPaths
           docText <- readFile filepathDoc
           case parseDoc filepathDoc docText of
              Left e    -> print e
-             Right doc -> case eval doc estr of 
+             Right doc -> case eval doc struct of 
                            Left e -> putStrLn $ "Error: " ++ e
-                           Right r -> putStrLn $ showFlatResult (flattenResult r) 
+                           Right r -> putStrLn $ showFlatResult (flattenResultList r) 
 
 --Stackoverflow
 prompt :: String -> IO String

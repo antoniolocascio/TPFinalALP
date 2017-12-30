@@ -28,14 +28,14 @@ import AST
 
 -- Catch
 -- Funciones principales
-scanImage :: String -> IO Estructura
+scanImage :: String -> IO StructPage
 scanImage filepath = do img <- CV.imdecode CV.ImreadGrayscale <$> B.readFile filepath 
                         blurred <- blurImage ((CV.exceptError $ M.coerceMat img) :: M.Mat (CV.S [ CV.D, CV.D]) (CV.S 1) (CV.S Word8))
                         (thresh, _) <- threshold ((CV.exceptError $ M.coerceMat blurred) :: CV.Mat (CV.S [CV.D, CV.D]) (CV.S 1) (CV.S Word8))
                         t' <- Mutable.thaw thresh
                         cnts <- CV.findContours CV.ContourRetrievalTree CV.ContourApproximationSimple t'
                         let c = (V.map removeInner (ignoreOutmost (aContorno  (V.head cnts)))) 
-                        return $ V.head (V.map (aEstructura img) (V.map removeSmaller c))
+                        return $ V.head (V.map (toStructPage img) (V.map removeSmaller c))
 
 ignoreOutmost :: Contorno -> V.Vector Contorno
 ignoreOutmost cnt | (V.head (cPuntos cnt)) == (0, 0) = cHijos cnt
@@ -52,11 +52,22 @@ removeSmaller (C a puntos hijos) = C a puntos (V.filter (\c -> (cArea c) > minAr
 
 
 -- Conversiones
-aEstructura :: M.Mat (CV.S [CV.D, CV.D]) CV.D CV.D -> Contorno -> Estructura
-aEstructura img c@(C _ puntos hijos) =  let n = V.length puntos 
+-- aEstructura :: M.Mat (CV.S [CV.D, CV.D]) CV.D CV.D -> Contorno -> Estructura
+-- aEstructura img c@(C _ puntos hijos) =  let n = V.length puntos 
+--                                         in if n == 4 
+--                                           then Rectangulo (V.toList (V.reverse (V.map (aEstructura img) hijos))) 
+--                                           else Circulo marked intesnsity
+--   where
+--     thresIntensity = 160 
+--     intesnsity = (meanIntensityCont ((CV.exceptError $ M.coerceMat img) :: 
+--                   M.Mat (CV.S [CV.D, CV.D]) (CV.S 1) CV.D) c)
+--     marked = intesnsity < thresIntensity
+
+toStructPage :: M.Mat (CV.S [CV.D, CV.D]) CV.D CV.D -> Contorno -> StructPage
+toStructPage img c@(C _ puntos hijos) =  let n = V.length puntos 
                                         in if n == 4 
-                                          then Rectangulo (V.toList (V.reverse (V.map (aEstructura img) hijos))) 
-                                          else Circulo marked intesnsity
+                                          then Rectangle (V.toList (V.reverse (V.map (toStructPage img) hijos))) 
+                                          else Circle marked
   where
     thresIntensity = 160 
     intesnsity = (meanIntensityCont ((CV.exceptError $ M.coerceMat img) :: 

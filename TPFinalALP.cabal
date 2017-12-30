@@ -17,11 +17,9 @@ library
   exposed-modules:     Lib,
                        BlurImage,
                        Threshold,
-                       TestMain,
                        AST,
                        Parser,
                        Eval,
-                       PDFMaker,
                        ImageRec
   build-depends:       base >= 4.7 && < 5
                     ,  JuicyPixels >=3.2.8.1

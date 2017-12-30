@@ -31,3 +31,37 @@ page
     endsection
   endsection
 endpage
+
+page
+  section ""
+    section "Section 2.1"
+      option "a)"
+      option "b)"
+      option "c)"
+      #option "d)"
+      multiple yes
+    endsection
+
+    section "Section 2.2"
+      option "a)"
+      option "b) Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+      option "c)"
+      option "d)"
+    endsection
+
+    section "Section 2.3"
+      option "a)"
+      option "b)"
+      option "c)"
+      #option "d)"
+    endsection
+
+    section "Section 2.4"
+      option "a)"
+      option "b) Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+      option "c)"
+      #option "d)"
+      multiple no
+    endsection
+  endsection
+endpage
