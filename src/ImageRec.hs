@@ -5,6 +5,7 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PackageImports #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module ImageRec where
 
@@ -24,18 +25,20 @@ import GHC.Int (Int32)
 import Data.List as L
 import GHC.TypeLits
 import AST
+import Control.Exception as E
 
-
--- Catch
 -- Funciones principales
-scanImage :: String -> IO StructPage
-scanImage filepath = do img <- CV.imdecode CV.ImreadGrayscale <$> B.readFile filepath 
-                        blurred <- blurImage ((CV.exceptError $ M.coerceMat img) :: M.Mat (CV.S [ CV.D, CV.D]) (CV.S 1) (CV.S Word8))
-                        (thresh, _) <- threshold ((CV.exceptError $ M.coerceMat blurred) :: CV.Mat (CV.S [CV.D, CV.D]) (CV.S 1) (CV.S Word8))
-                        t' <- Mutable.thaw thresh
-                        cnts <- CV.findContours CV.ContourRetrievalTree CV.ContourApproximationSimple t'
-                        let c = (V.map removeInner (ignoreOutmost (aContorno  (V.head cnts)))) 
-                        return $ V.head (V.map (toStructPage img) (V.map removeSmaller c))
+scanImage :: FilePath -> IO (Either Error StructPage)
+scanImage filepath = E.catch (tryScanImage filepath) (\(e :: E.IOException) -> return (Left $ show e))
+
+tryScanImage :: FilePath -> IO (Either Error StructPage)
+tryScanImage filepath = do  img <- CV.imdecode CV.ImreadGrayscale <$> B.readFile filepath 
+                            blurred <- blurImage ((CV.exceptError $ M.coerceMat img) :: M.Mat (CV.S [ CV.D, CV.D]) (CV.S 1) (CV.S Word8))
+                            (thresh, _) <- threshold ((CV.exceptError $ M.coerceMat blurred) :: CV.Mat (CV.S [CV.D, CV.D]) (CV.S 1) (CV.S Word8))
+                            t' <- Mutable.thaw thresh
+                            cnts <- CV.findContours CV.ContourRetrievalTree CV.ContourApproximationSimple t'
+                            let c = (V.map removeInner (ignoreOutmost (aContorno  (V.head cnts)))) 
+                            return $ Right $ V.head (V.map (toStructPage img) (V.map removeSmaller c))
 
 ignoreOutmost :: Contorno -> V.Vector Contorno
 ignoreOutmost cnt | (V.head (cPuntos cnt)) == (0, 0) = cHijos cnt

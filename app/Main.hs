@@ -1,3 +1,5 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+
 module Main where
 
 import Parser (parseDoc)
@@ -5,7 +7,8 @@ import Eval (eval, flattenResultList)
 import System.IO 
 --import PDFMaker (makePDF)
 import ImageRec (scanImage)
-import AST (showFlatResult)
+import AST 
+import Control.Exception as E
 
 
 -- Hacer bien
@@ -34,16 +37,43 @@ makeDoc = undefined
 scan :: IO ()
 scan =  do 
           input <- prompt "Image/s: "
-          filepathDoc <- prompt "Document: "
+          docPath <- prompt "Document: "
 
           let imgPaths = words input
-          struct <- mapM scanImage imgPaths
-          docText <- readFile filepathDoc
-          case parseDoc filepathDoc docText of
-             Left e    -> print e
-             Right doc -> case eval doc struct of 
-                           Left e -> putStrLn $ "Error: " ++ e
-                           Right r -> putStrLn $ showFlatResult (flattenResultList r) 
+          scanRes <- scanPaths imgPaths
+          readRes <- catchReadFile docPath
+
+          case safeScan scanRes readRes of
+            Left e -> putStrLn $ "Error: " ++ e
+            Right fr -> putStrLn $ showFlatResult fr
+
+  where
+    scanPaths :: [FilePath] -> IO (Either Error Structure)
+    scanPaths [] = return (Right [])
+    scanPaths (fp : fps) = do 
+      scanRes <- scanImage fp
+      case scanRes of
+        Left e -> return (Left e)
+        Right pageStr -> do
+                          scanPathsRes <- scanPaths fps
+                          case scanPathsRes of
+                            Left e -> return (Left e)
+                            Right str -> return (Right $ pageStr : str)
+
+    catchReadFile :: FilePath -> IO (Either Error String)
+    catchReadFile fp = E.catch 
+      (readFile fp >>= \s -> return $ Right s) 
+      (\(e :: IOException) -> return $ Left (show e))
+
+    safeScan :: Either Error Structure -> Either Error String -> Either Error FlatResult
+    safeScan scanRes readRes = do
+      struct <- scanRes
+      docText <- readRes
+      doc <- parseDoc docText
+      results <- eval doc struct
+      return $ flattenResultList results
+
+
 
 --Stackoverflow
 prompt :: String -> IO String

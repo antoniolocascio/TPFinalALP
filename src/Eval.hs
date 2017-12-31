@@ -3,9 +3,6 @@ module Eval where
 import AST
 import Data.List
 
-raise :: String -> Either Error a
-raise e = Left e
-
 -- type Structure = [StructPage]
 -- data StructPage = Rectangle  [StructPage] | Circle Bool
 -- type Document = [Page] 

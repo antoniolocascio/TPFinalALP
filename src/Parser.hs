@@ -92,11 +92,13 @@ restrParser = do  reserved docl "multiple"
 ------------------------------------
 -- Función de parseo
 ------------------------------------
-parseDoc :: SourceName -> String -> Either ParseError Document
-parseDoc = parse (totParser docParser)
+parseDoc :: String -> Either Error Document
+parseDoc str = case parse (totParser docParser) "" str of
+                    Left pe -> Left $ show pe
+                    Right doc -> Right doc
 
 parser :: String -> Document
-parser s = either (error. show) id (parseDoc "" s)
+parser s = either error id (parseDoc s)
 
 
 

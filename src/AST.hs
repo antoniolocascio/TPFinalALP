@@ -38,6 +38,10 @@ data Result = Sect [Result] | Ans [Res] deriving Show
 type Res = Bool
 
 type Error = String
+
+raise :: String -> Either Error a
+raise e = Left e
+
 type ErrorResult = Either Error Result
 
 
