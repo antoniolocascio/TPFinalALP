@@ -9,37 +9,29 @@ import PDFMaker (makePDF)
 import ImageRec (scanImage)
 import AST 
 import Control.Exception as E
+import System.Environment
 
 
 -- Hacer bien
 main :: IO ()
 main = do 
-        ln <- prompt "> "
-        case ln of
-          "make" -> makeDoc >> main
-          "scan" -> scan >> main
-          "quit" -> return ()
-          _ -> printHelp >> main
+        args <- getArgs
+        case args of
+          ["make",fp,name] -> makeDoc fp name
+          ("scan":fp:images) -> scan fp images
+          _ -> printHelp
         
 
-
-makeDoc :: IO ()
--- makeDoc = undefined
-makeDoc = do
-            filepathDoc <- prompt "Document description file: "
-            pdfName <- prompt "Document name: "
+makeDoc :: FilePath -> FilePath -> IO ()
+makeDoc filepathDoc pdfName = do
             readRes <- catchReadFile filepathDoc
             case readRes >>= parseDoc of
               Left e    -> putStrLn $ "Error: " ++ e
-              Right doc -> do makePDF doc pdfName
-                              putStrLn "Done!"
+              Right doc -> makePDF doc pdfName
 
-scan :: IO ()
-scan =  do 
-          input <- prompt "Image/s: "
-          docPath <- prompt "Document: "
 
-          let imgPaths = words input
+scan :: FilePath -> [FilePath] -> IO ()
+scan docPath imgPaths=  do 
           scanRes <- scanPaths imgPaths
           readRes <- catchReadFile docPath
 
@@ -69,14 +61,6 @@ scan =  do
       return $ flattenResultList results
 
 
-
---Stackoverflow
-prompt :: String -> IO String
-prompt text = do
-    putStr text
-    hFlush stdout
-    getLine
-
 catchReadFile :: FilePath -> IO (Either Error String)
 catchReadFile fp = E.catch 
   (readFile fp >>= \s -> return $ Right s) 
@@ -85,6 +69,5 @@ catchReadFile fp = E.catch
 -- TODO
 printHelp :: IO ()
 printHelp = do  putStrLn "Commands: "
-                putStrLn "    make"
-                putStrLn "    scan"
-                putStrLn "    quit"
+                putStrLn "    make  FILEPATH  OUTPUT_NAME"
+                putStrLn "    scan  DOC_DESCRIPTION_FILEPATH  IMAGE_FILEPATH/S"
