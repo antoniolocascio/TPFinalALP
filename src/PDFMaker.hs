@@ -20,20 +20,29 @@ rightBound = 2480
 makePDF :: Document -> String -> IO ()
 makePDF doc name = do
   let rect = PDFRect 0 0 2480 3508
-  runPdf name (standardDocInfo { author=toPDFString "PDFMaker", compressed = False}) rect $ do
-      page1 <- addPage Nothing
-      makeDocument page1 doc
+  runPdf name (standardDocInfo { author=toPDFString "PDFMaker", compressed = False}) rect (makeDocument doc)
+  -- $ do
+  --     page <- addPage Nothing
+  --     makePage page doc
 
-makeDocument :: PDFReference PDFPage -> Document -> PDF () 
-makeDocument page doc = drawWithPage page $ makeSection doc (upperBound - padding) (lowerBound + padding) (leftBound + padding) (rightBound - padding)
+makeDocument :: Document -> PDF ()
+makeDocument [] = return ()
+makeDocument (pg:pgs) = do
+  page <- addPage Nothing 
+  makePage page pg
+  makeDocument pgs
 
-makeSection :: Document -> PDFFloat -> PDFFloat -> PDFFloat -> PDFFloat -> Draw ()
+
+makePage :: PDFReference PDFPage -> Page -> PDF () 
+makePage page doc = drawWithPage page $ makeSection doc (upperBound - padding) (lowerBound + padding) (leftBound + padding) (rightBound - padding)
+
+makeSection :: Page -> PDFFloat -> PDFFloat -> PDFFloat -> PDFFloat -> Draw ()
 makeSection (Section t (Options res opts)) upb lob leb rib = do
   let lowerLeft = leb :+ lob 
   let upperRight = rib :+ upb
   strokeColor black
   setWidth lineW
-  stroke $ Rectangle lowerLeft upperRight
+  stroke $ Graphics.PDF.Rectangle lowerLeft upperRight
   makeTitle t leb (upb + padding / 4)
   makeRestriction res (leb + padding / 4) (upb - (fromIntegral fontSize)) 
   let nopts = (fromIntegral $ length opts) :: PDFFloat
@@ -50,7 +59,7 @@ makeSection (Section t (Subs subs)) upb lob leb rib = do
   let upperRight = rib :+ upb
   strokeColor black
   setWidth lineW
-  stroke $ Rectangle lowerLeft upperRight
+  stroke $ Graphics.PDF.Rectangle lowerLeft upperRight
   let nsubs = (fromIntegral $ length subs) :: PDFFloat
   let totH = (upb - lob)
   let subH = (totH - padding * (nsubs + 1)) / nsubs
@@ -76,7 +85,7 @@ makeText str x y = drawText $ do
          renderMode FillText
          displayText $ toPDFString str
 
-makeSubsections :: [Document] -> PDFFloat -> PDFFloat -> PDFFloat -> PDFFloat -> Draw ()
+makeSubsections :: [Page] -> PDFFloat -> PDFFloat -> PDFFloat -> PDFFloat -> Draw ()
 makeSubsections [] _ _ _ _ = return ()
 makeSubsections (doc : docs) upb leb h w = do
   makeSection doc upb (upb - h) leb (leb + w)
@@ -90,14 +99,14 @@ makeOptions (opt : opts) upb leb h w = do
 
 makeOption :: Option -> PDFFloat -> PDFFloat -> PDFFloat -> PDFFloat -> Bool -> Draw ()
 makeOption opt upb leb h w last = do
-  displayFormattedText  (Rectangle (leb :+ (upb - h)) ((leb + w) :+ upb)) 
+  displayFormattedText  (Graphics.PDF.Rectangle (leb :+ (upb - h)) ((leb + w) :+ upb)) 
                         NormalParagraph 
                         (Font (PDFFont Helvetica fontSize) black black) $ do 
                           paragraph $ do
                                         txt $ opt
   strokeColor black
   setWidth lineW
-  stroke $ Circle (leb + w + 2 * padding) (upb - (h / 2)) (min circleSize (2*h))
+  stroke $ Graphics.PDF.Circle (leb + w + 2 * padding) (upb - (h / 2)) (min circleSize (2*h))
   if last 
     then return ()
     else do setWidth (lineW / 3)

@@ -5,7 +5,7 @@ module Main where
 import Parser (parseDoc)
 import Eval (eval, flattenResultList)
 import System.IO 
---import PDFMaker (makePDF)
+import PDFMaker (makePDF)
 import ImageRec (scanImage)
 import AST 
 import Control.Exception as E
@@ -24,15 +24,15 @@ main = do
 
 
 makeDoc :: IO ()
-makeDoc = undefined
--- makeDoc = do
---             filepathDoc <- prompt "Document description: "
---             pdfName <- prompt "Document name: "
---             docText <- readFile filepathDoc
---             case parseDoc filepathDoc docText of
---               Left e    -> putStrLn $ "Error: " ++ (show e)
---               Right doc -> do makePDF doc pdfName
---                               putStrLn "Done!"
+-- makeDoc = undefined
+makeDoc = do
+            filepathDoc <- prompt "Document description file: "
+            pdfName <- prompt "Document name: "
+            readRes <- catchReadFile filepathDoc
+            case readRes >>= parseDoc of
+              Left e    -> putStrLn $ "Error: " ++ e
+              Right doc -> do makePDF doc pdfName
+                              putStrLn "Done!"
 
 scan :: IO ()
 scan =  do 
@@ -60,11 +60,6 @@ scan =  do
                             Left e -> return (Left e)
                             Right str -> return (Right $ pageStr : str)
 
-    catchReadFile :: FilePath -> IO (Either Error String)
-    catchReadFile fp = E.catch 
-      (readFile fp >>= \s -> return $ Right s) 
-      (\(e :: IOException) -> return $ Left (show e))
-
     safeScan :: Either Error Structure -> Either Error String -> Either Error FlatResult
     safeScan scanRes readRes = do
       struct <- scanRes
@@ -81,6 +76,11 @@ prompt text = do
     putStr text
     hFlush stdout
     getLine
+
+catchReadFile :: FilePath -> IO (Either Error String)
+catchReadFile fp = E.catch 
+  (readFile fp >>= \s -> return $ Right s) 
+  (\(e :: IOException) -> return $ Left (show e))
 
 -- TODO
 printHelp :: IO ()

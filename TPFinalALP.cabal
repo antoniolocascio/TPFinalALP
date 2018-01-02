@@ -20,7 +20,8 @@ library
                        AST,
                        Parser,
                        Eval,
-                       ImageRec
+                       ImageRec,
+                       PDFMaker
   build-depends:       base >= 4.7 && < 5
                     ,  JuicyPixels >=3.2.8.1
                     ,  data-default >=0.7.1.1
