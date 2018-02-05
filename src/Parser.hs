@@ -19,39 +19,7 @@ docl :: TokenParser u
 docl = makeTokenParser (emptyDef   { commentLine   = "#"
                                    , reservedNames = ["page", "endpage", "section", "endsection", "multiple", "option", "yes", "no"] 
                                    })
-
--- docParser :: Parser Document
--- docParser = do  reserved docl "section"
---                 reservedOp docl ":"
---                 title <- stringLiteral docl
---                 subsection <- subParser
---                 return (Section title subsection)
-
--- subParser :: Parser Subsection
--- subParser = do  options <- many1 optParser
---                 (do  allowed <- restrParser
---                      --reservedOp docl ";"
---                      return (Options allowed options)
---                  <|> return (Options False options))
---             <|> do  subsections <- many1 docParser
---                     return (Subs subsections)
-
--- optParser :: Parser Option
--- optParser = do  reserved docl "option"
---                 reservedOp docl ":"
---                 str <- stringLiteral docl
---                 return str
-
--- restrParser :: Parser Restriction
--- restrParser = do  reserved docl "multiple"
---                   reservedOp docl ":"
---                   (do reserved docl "yes"
---                       return False
---                    <|> do reserved docl "no"
---                           return True)
-
-
-
+-- Funciones de parseo parciales
 docParser :: Parser Document
 docParser = many1 pageParser
 
@@ -89,9 +57,7 @@ restrParser = do  reserved docl "multiple"
                           return True)
 
 
-------------------------------------
 -- Función de parseo
-------------------------------------
 parseDoc :: String -> Either Error Document
 parseDoc str = case parse (totParser docParser) "" str of
                     Left pe -> Left $ show pe

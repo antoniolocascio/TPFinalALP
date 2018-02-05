@@ -7,6 +7,9 @@
 {-# LANGUAGE PackageImports #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
+-- Basado en el ejemplo dado en: https://stackoverflow.com/questions/39661287/gaussianblurimage-in-haskell-opencv-haskell-binding-to-opencv-3-1
+-- y en el algoritmo explicado en https://www.pyimagesearch.com/2016/02/08/opencv-shape-detection/
+
 module ImageRec where
 
 import Control.Monad (void)
@@ -40,32 +43,24 @@ tryScanImage filepath = do  img <- CV.imdecode CV.ImreadGrayscale <$> B.readFile
                             let c = (V.map removeInner (ignoreOutmost (aContorno  (V.head cnts)))) 
                             return $ Right $ V.head (V.map (toStructPage img) (V.map removeSmaller c))
 
+-- Se ignora el contorno mas externo, correspondiente a los limites de la imagen
 ignoreOutmost :: Contorno -> V.Vector Contorno
 ignoreOutmost cnt | (V.head (cPuntos cnt)) == (0, 0) = cHijos cnt
                   | otherwise = V.singleton $ cnt
 
+-- Utilizada para ignorar la duplicación de contornos
 removeInner :: Contorno -> Contorno
 removeInner c@(C a puntos hijos) 
   | V.length hijos == 1 && isInner (cPuntos $ hijos V.! 0) puntos = C a puntos (V.map removeInner (cHijos $ hijos V.! 0))
   | otherwise = c
 
+-- Se descartan los contornos menores a un area minima, para ignorar los contornos provenientes de letras
 removeSmaller :: Contorno -> Contorno
 removeSmaller (C a puntos hijos) = C a puntos (V.filter (\c -> (cArea c) > minArea) (V.map removeSmaller hijos))
   where minArea = 1000
 
 
 -- Conversiones
--- aEstructura :: M.Mat (CV.S [CV.D, CV.D]) CV.D CV.D -> Contorno -> Estructura
--- aEstructura img c@(C _ puntos hijos) =  let n = V.length puntos 
---                                         in if n == 4 
---                                           then Rectangulo (V.toList (V.reverse (V.map (aEstructura img) hijos))) 
---                                           else Circulo marked intesnsity
---   where
---     thresIntensity = 160 
---     intesnsity = (meanIntensityCont ((CV.exceptError $ M.coerceMat img) :: 
---                   M.Mat (CV.S [CV.D, CV.D]) (CV.S 1) CV.D) c)
---     marked = intesnsity < thresIntensity
-
 toStructPage :: M.Mat (CV.S [CV.D, CV.D]) CV.D CV.D -> Contorno -> StructPage
 toStructPage img c@(C _ puntos hijos) =  let n = V.length puntos 
                                         in if n == 4 
@@ -99,6 +94,9 @@ cHijos (C _ _ hijos) = hijos
 cArea :: Contorno -> Double
 cArea (C a _ _) = a
 
+
+-- Determina si un contorno (los puntos que lo describen) corresponde al interior de otro contorno 
+-- Esto sucede por el grosor de la linea que lo forma
 isInner :: V.Vector Punto -> V.Vector Punto -> Bool
 isInner v1 v2 = let 
                   l1 = L.sortBy pointOrder (V.toList v1)
@@ -120,6 +118,7 @@ isInner v1 v2 = let
         GT -> GT
         EQ -> rangeComp y1 y2
 
+-- Calcula el area dentro de la figura descripta por un vector de puntos 
 pArea :: V.Vector Punto -> Double
 pArea puntos =  let points = V.map dePunto puntos 
                 in  CV.exceptError $ CV.contourArea points CV.ContourAreaAbsoluteValue
@@ -127,16 +126,19 @@ pArea puntos =  let points = V.map dePunto puntos
     dePunto :: Punto -> CV.Point2f
     dePunto (a, b) = CV.toPoint (V2 (fromIntegral a) (fromIntegral b))
 
+-- Calcula la intensidad media de un contorno
 meanIntensityCont :: (1 GHC.TypeLits.<= channels, channels GHC.TypeLits.<= 4) =>
   M.Mat (CV.S [height, width]) (CV.S channels) depth -> Contorno -> Double
 meanIntensityCont img cnt = let v = fst $ CV.exceptError (CV.meanStdDev (CV.exceptError $ cropFitCont img cnt) Nothing)
                                 (V4 x _ _ _) = (CV.fromScalar v) :: V4 Double
                             in x
 
+-- Devuelve la matriz correspondiente a el area de la imagen que contiene un contorno dado
 cropFitCont :: (1 GHC.TypeLits.<= channels, channels GHC.TypeLits.<= 4) =>
   M.Mat (CV.S [height, width]) (CV.S channels) depth -> Contorno -> CV.CvExcept (CV.Mat (CV.S [CV.D, CV.D]) (CV.S channels) depth)
 cropFitCont img cont = CV.matSubRect img (fitRect $ cPuntos cont)
 
+-- Calcula el rectangulo que contiene un contorno dado por los puntos que lo describen
 fitRect :: V.Vector Punto -> CV.Rect2i
 fitRect puntos =  let
                     xs = V.map (\(x,_) -> x) puntos
@@ -149,15 +151,9 @@ fitRect puntos =  let
                     w = maxx - minx
                   in CV.toRect $ CV.HRect (V2 minx miny) (V2 h w)
     
--- (h, w)
+-- Devuelve las dimensiones de una matriz, con el formato (nfilas, ncolumnas)
 matDims :: CV.Mat shape channels depth -> (Int32, Int32)
 matDims img = let (M.MatInfo sh _ _) = M.matInfo img in (sh !! 0, sh !! 1)
-
-
-
-
-
-                      
 
 
 

@@ -5,6 +5,9 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE DataKinds #-}
 
+
+-- Basado en el ejemplo dado en: https://stackoverflow.com/questions/39661287/gaussianblurimage-in-haskell-opencv-haskell-binding-to-opencv-3-1
+
 module BlurImage
     ( 
     blurImage
