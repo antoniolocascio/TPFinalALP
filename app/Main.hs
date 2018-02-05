@@ -11,8 +11,7 @@ import AST
 import Control.Exception as E
 import System.Environment
 
-
--- Hacer bien
+-- Parsea las dos opciones posibles de comandos
 main :: IO ()
 main = do 
         args <- getArgs
@@ -22,6 +21,7 @@ main = do
           _ -> printHelp
         
 
+-- Crear un archivo PDF en base a la descripcion de un documento
 makeDoc :: FilePath -> FilePath -> IO ()
 makeDoc filepathDoc pdfName = do
             readRes <- catchReadFile filepathDoc
@@ -30,6 +30,7 @@ makeDoc filepathDoc pdfName = do
               Right doc -> makePDF doc pdfName
 
 
+-- Escanear imagenes y compararlas con una descripcion de un documento
 scan :: FilePath -> [FilePath] -> IO ()
 scan docPath imgPaths=  do 
           scanRes <- scanPaths imgPaths
