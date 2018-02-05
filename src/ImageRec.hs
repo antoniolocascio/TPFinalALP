@@ -43,7 +43,7 @@ tryScanImage filepath = do  img <- CV.imdecode CV.ImreadGrayscale <$> B.readFile
                             let cnt = V.head cnts
                                 totalArea = let (h,w) = matDims img in fromIntegral $ h * w :: Double 
                                 contorno = aContorno cnt
-                                c = removeSmaller totalArea (removeInner totalArea (V.head (ignoreOutmost contorno)))
+                                c = V.head $ V.map ((removeSmaller totalArea) . (removeInner totalArea))  (ignoreOutmost contorno)                 
                             return $ Right $ toStructPage img c
 
 
@@ -54,16 +54,16 @@ ignoreOutmost cnt | (V.head (cPuntos cnt)) == (0, 0) = cHijos cnt
 
 -- Utilizada para ignorar la duplicación de contornos
 removeInner :: Double -> Contorno -> Contorno
-removeInner totalArea c@(C a puntos hijos) 
+removeInner totalArea c@(C a puntos hijos)
   | V.length hijos == 1 && isInner totalArea (cPuntos $ hijos V.! 0) puntos = C a puntos (V.map (removeInner totalArea) (cHijos $ hijos V.! 0))
-  | otherwise = c
+  | otherwise = C a puntos (V.map (removeInner totalArea) hijos) 
 
 -- Se descartan los contornos menores a un area minima calculada en proporcion al area total
 -- para ignorar los contornos provenientes de letras y ruido
 removeSmaller :: Double -> Contorno -> Contorno
-removeSmaller totalArea (C a puntos hijos) = C a puntos (V.filter (\c -> (cArea c) > (totalArea / minScale)) (V.map (removeSmaller totalArea) hijos))
-  where minScale = 8000
-
+removeSmaller totalArea (C a puntos hijos) = C a puntos (V.filter (\c -> (cArea c) > minArea) (V.map (removeSmaller totalArea) hijos))
+  where minScale = 8000 
+        minArea = max 200 (totalArea / minScale)
 -- Conversiones
 toStructPage :: M.Mat (CV.S [CV.D, CV.D]) CV.D CV.D -> Contorno -> StructPage
 toStructPage img c@(C _ puntos hijos) =  let n = V.length puntos 
@@ -108,7 +108,7 @@ isInner totalArea v1 v2 = let
                           in 
                             (V.length v1 == V.length v2) && L.all (\(x, y) -> withinRange x y) (L.zip l1 l2)
   where
-    range = floor (totalArea / 400000) 
+    range = max 10 (floor (totalArea / 300000)) 
     withinRange :: Punto -> Punto -> Bool
     withinRange (x1, y1) (x2, y2) = abs (x1 - x2) < range && abs (y1 - y2) < range
     rangeComp :: Int32 -> Int32 -> Ordering
@@ -121,6 +121,7 @@ isInner totalArea v1 v2 = let
         LT -> LT
         GT -> GT
         EQ -> rangeComp y1 y2
+
 
 -- Calcula el area dentro de la figura descripta por un vector de puntos 
 pArea :: V.Vector Punto -> Double
