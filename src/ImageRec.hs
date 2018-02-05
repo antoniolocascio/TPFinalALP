@@ -40,8 +40,12 @@ tryScanImage filepath = do  img <- CV.imdecode CV.ImreadGrayscale <$> B.readFile
                             (thresh, _) <- threshold ((CV.exceptError $ M.coerceMat blurred) :: CV.Mat (CV.S [CV.D, CV.D]) (CV.S 1) (CV.S Word8))
                             t' <- Mutable.thaw thresh
                             cnts <- CV.findContours CV.ContourRetrievalTree CV.ContourApproximationSimple t'
-                            let c = (V.map removeInner (ignoreOutmost (aContorno  (V.head cnts)))) 
-                            return $ Right $ V.head (V.map (toStructPage img) (V.map removeSmaller c))
+                            let cnt = V.head cnts
+                                totalArea = let (h,w) = matDims img in fromIntegral $ h * w :: Double 
+                                contorno = aContorno cnt
+                                c = removeSmaller totalArea (removeInner totalArea (V.head (ignoreOutmost contorno)))
+                            return $ Right $ toStructPage img c
+
 
 -- Se ignora el contorno mas externo, correspondiente a los limites de la imagen
 ignoreOutmost :: Contorno -> V.Vector Contorno
@@ -49,16 +53,16 @@ ignoreOutmost cnt | (V.head (cPuntos cnt)) == (0, 0) = cHijos cnt
                   | otherwise = V.singleton $ cnt
 
 -- Utilizada para ignorar la duplicación de contornos
-removeInner :: Contorno -> Contorno
-removeInner c@(C a puntos hijos) 
-  | V.length hijos == 1 && isInner (cPuntos $ hijos V.! 0) puntos = C a puntos (V.map removeInner (cHijos $ hijos V.! 0))
+removeInner :: Double -> Contorno -> Contorno
+removeInner totalArea c@(C a puntos hijos) 
+  | V.length hijos == 1 && isInner totalArea (cPuntos $ hijos V.! 0) puntos = C a puntos (V.map (removeInner totalArea) (cHijos $ hijos V.! 0))
   | otherwise = c
 
--- Se descartan los contornos menores a un area minima, para ignorar los contornos provenientes de letras
-removeSmaller :: Contorno -> Contorno
-removeSmaller (C a puntos hijos) = C a puntos (V.filter (\c -> (cArea c) > minArea) (V.map removeSmaller hijos))
-  where minArea = 1000
-
+-- Se descartan los contornos menores a un area minima calculada en proporcion al area total
+-- para ignorar los contornos provenientes de letras y ruido
+removeSmaller :: Double -> Contorno -> Contorno
+removeSmaller totalArea (C a puntos hijos) = C a puntos (V.filter (\c -> (cArea c) > (totalArea / minScale)) (V.map (removeSmaller totalArea) hijos))
+  where minScale = 8000
 
 -- Conversiones
 toStructPage :: M.Mat (CV.S [CV.D, CV.D]) CV.D CV.D -> Contorno -> StructPage
@@ -97,14 +101,14 @@ cArea (C a _ _) = a
 
 -- Determina si un contorno (los puntos que lo describen) corresponde al interior de otro contorno 
 -- Esto sucede por el grosor de la linea que lo forma
-isInner :: V.Vector Punto -> V.Vector Punto -> Bool
-isInner v1 v2 = let 
-                  l1 = L.sortBy pointOrder (V.toList v1)
-                  l2 = L.sortBy pointOrder (V.toList v2)
-                in 
-                  (V.length v1 == V.length v2) && L.all (\(x, y) -> withinRange x y) (L.zip l1 l2)
+isInner :: Double -> V.Vector Punto -> V.Vector Punto -> Bool
+isInner totalArea v1 v2 = let 
+                            l1 = L.sortBy pointOrder (V.toList v1)
+                            l2 = L.sortBy pointOrder (V.toList v2)
+                          in 
+                            (V.length v1 == V.length v2) && L.all (\(x, y) -> withinRange x y) (L.zip l1 l2)
   where
-    range = 20
+    range = floor (totalArea / 400000) 
     withinRange :: Punto -> Punto -> Bool
     withinRange (x1, y1) (x2, y2) = abs (x1 - x2) < range && abs (y1 - y2) < range
     rangeComp :: Int32 -> Int32 -> Ordering
@@ -154,8 +158,6 @@ fitRect puntos =  let
 -- Devuelve las dimensiones de una matriz, con el formato (nfilas, ncolumnas)
 matDims :: CV.Mat shape channels depth -> (Int32, Int32)
 matDims img = let (M.MatInfo sh _ _) = M.matInfo img in (sh !! 0, sh !! 1)
-
-
 
 
 
