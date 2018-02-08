@@ -10,7 +10,7 @@
 -- Basado en el ejemplo dado en: https://stackoverflow.com/questions/39661287/gaussianblurimage-in-haskell-opencv-haskell-binding-to-opencv-3-1
 -- y en el algoritmo explicado en https://www.pyimagesearch.com/2016/02/08/opencv-shape-detection/
 
-module ImageRec where
+module ImageRec (scanImage) where
 
 import Control.Monad (void)
 import Control.Monad.Primitive 
@@ -27,7 +27,7 @@ import Linear.V2
 import GHC.Int (Int32)
 import Data.List as L
 import GHC.TypeLits
-import AST
+import Types
 import Control.Exception as E
 
 -- Funciones principales

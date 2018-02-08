@@ -16,7 +16,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     BlurImage,
                        Threshold,
-                       AST,
+                       Types,
                        Parser,
                        Eval,
                        ImageRec,

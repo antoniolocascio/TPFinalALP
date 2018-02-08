@@ -1,16 +1,12 @@
-module Eval where
+module Eval (eval, flattenResultList) where
 
-import AST
+import Types
 import Data.List
 
--- type Structure = [StructPage]
--- data StructPage = Rectangle  [StructPage] | Circle Bool
--- type Document = [Page] 
--- data Page = Section Title Subsection deriving Show
--- data Subsection = Subs [Page] | Options Restriction [Option] deriving Show
+-- Funciones de evaluacion
 
-
-eval :: Document -> Structure -> Either Error [Result]
+-- Funcion de evaluacion principal
+eval :: Document -> Structure -> Either Error Result
 eval [] [] = return []
 eval (page:pages) (str:strs) = do 
   res <- evalPage page str
@@ -18,7 +14,8 @@ eval (page:pages) (str:strs) = do
   return $ res : results
 eval _ _ = raise "The number of pages in the description file doesn't match with the number of pages scanned."
 
-evalPage :: Page -> StructPage -> ErrorResult
+-- Evaluacion de una pagina
+evalPage :: Page -> StructPage -> ErrorPageResult
 evalPage (Section t (Options res opts)) (Rectangle subestr) = do 
   results <- evalRes opts subestr t
   if res && (length (filter id results) > 1) 
@@ -33,6 +30,7 @@ evalPage (Section t (Subs docs)) (Rectangle subestr) = do
 
 evalPage (Section t _) _ = raise $ generalMismatch t
 
+-- Evaluacion de opciones
 evalRes :: [Option] -> [StructPage] -> Title -> Either Error [Res]
 evalRes [opt] [Circle mked] _ = return $ [mked]
 evalRes (opt:opts) ((Circle mked) : strs) t = do
@@ -41,15 +39,16 @@ evalRes (opt:opts) ((Circle mked) : strs) t = do
 evalRes _ _ t = raise $ "Options don't match in section: " ++ t ++ "."
 
 
-flattenResultList :: [Result] -> FlatResult
+-- Funciones de presentacion de resultados
+flattenResultList :: Result -> FlatResult
 flattenResultList results = concat $ map (\(res, i) -> flattenResult res i) (zip results [1..(length results)])
 
-flattenResult :: Result -> Int -> FlatResult
+flattenResult :: PageResult -> Int -> FlatResult
 flattenResult res i = flattenResult' res [i]
   where
-    flattenResult' :: Result -> SectNum -> FlatResult
+    flattenResult' :: PageResult -> SectNum -> FlatResult
     flattenResult' (Sect subsects) sn = concat $ map (\(s, sn) -> flattenResult' s sn) (zip subsects [i : sn | i <- [1..(length subsects)]]) 
-    flattenResult' (Ans results) sn = [(sn, findIndices id results)]
+    flattenResult' (Ans results) sn = [(sn, map (+1) $ findIndices id results)]
 
 
 -- Errores

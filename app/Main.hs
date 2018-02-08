@@ -7,7 +7,7 @@ import Eval (eval, flattenResultList)
 import System.IO 
 import PDFMaker (makePDF)
 import ImageRec (scanImage)
-import AST 
+import Types
 import Control.Exception as E
 import System.Environment
 
@@ -36,7 +36,7 @@ scan docPath imgPaths=  do
           scanRes <- scanPaths imgPaths
           readRes <- catchReadFile docPath
 
-          case safeScan scanRes readRes of
+          case safeParseEval scanRes readRes of
             Left e -> putStrLn $ "Error: " ++ e
             Right fr -> putStrLn $ showFlatResult fr
 
@@ -53,8 +53,8 @@ scan docPath imgPaths=  do
                             Left e -> return (Left e)
                             Right str -> return (Right $ pageStr : str)
 
-    safeScan :: Either Error Structure -> Either Error String -> Either Error FlatResult
-    safeScan scanRes readRes = do
+    safeParseEval :: Either Error Structure -> Either Error String -> Either Error FlatResult
+    safeParseEval scanRes readRes = do
       struct <- scanRes
       docText <- readRes
       doc <- parseDoc docText
@@ -67,8 +67,7 @@ catchReadFile fp = E.catch
   (readFile fp >>= \s -> return $ Right s) 
   (\(e :: IOException) -> return $ Left (show e))
 
--- TODO
 printHelp :: IO ()
 printHelp = do  putStrLn "Commands: "
                 putStrLn "    make  FILEPATH  OUTPUT_NAME"
-                putStrLn "    scan  DOC_DESCRIPTION_FILEPATH  IMAGE_FILEPATH/S"
+                putStrLn "    scan  DOC_DESCRIPTION_FILEPATH  IMAGE_FILEPATH(S)"

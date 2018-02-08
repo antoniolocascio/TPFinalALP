@@ -4,7 +4,7 @@ import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Error
 import Text.Parsec.Token
 import Text.Parsec.Language (emptyDef)
-import AST
+import Types
 
 -- Funcion para facilitar el testing del parser.
 totParser :: Parser a -> Parser a

@@ -1,4 +1,4 @@
-module AST where
+module Types where
 
 import Data.Vector as V
 import GHC.Int (Int32)
@@ -37,7 +37,8 @@ instance Show Contorno where
 
 
 -- Representacion de resultados
-data Result = Sect [Result] | Ans [Res] deriving Show
+type Result = [PageResult]
+data PageResult = Sect [PageResult] | Ans [Res] deriving Show
 type Res = Bool
 
 type FlatResult = [(SectNum, [Int])] 
@@ -47,7 +48,7 @@ showFlatResult :: FlatResult -> String
 showFlatResult fr = "Results:\n" L.++ showFlatResult' fr
   where
     showFlatResult' [] = ""
-    showFlatResult' ((sn, res):fr) = "Question " L.++ showDottedSN sn L.++ ": " L.++ show res L.++ "\n" L.++ showFlatResult' fr
+    showFlatResult' ((sn, res):fr) = showDottedSN sn L.++ ": " L.++ show res L.++ "\n" L.++ showFlatResult' fr
     showDottedSN = (L.intersperse '.') . L.concat . (L.map show) . L.reverse 
 
 type Error = String
@@ -55,4 +56,4 @@ type Error = String
 raise :: String -> Either Error a
 raise e = Left e
 
-type ErrorResult = Either Error Result
+type ErrorPageResult = Either Error PageResult

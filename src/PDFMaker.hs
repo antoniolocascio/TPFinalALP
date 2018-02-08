@@ -1,6 +1,6 @@
-module PDFMaker where
+module PDFMaker (makePDF) where
 
-import AST
+import Types
 import Graphics.PDF
 
 padding :: PDFFloat
@@ -60,6 +60,7 @@ makeSection (Section t (Subs subs)) upb lob leb rib = do
   strokeColor black
   setWidth lineW
   stroke $ Graphics.PDF.Rectangle lowerLeft upperRight
+  makeText t leb (upb + padding / 4)
   let nsubs = (fromIntegral $ length subs) :: PDFFloat
   let totH = (upb - lob)
   let subH = (totH - padding * (nsubs + 1)) / nsubs
