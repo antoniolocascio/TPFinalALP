@@ -25,6 +25,7 @@ import GHC.Int (Int32)
 thresholdImage :: (depth `In` '[Word8, Float]) => (M.Mat shape ('S 1) ('S depth)) -> CV.CvExcept (M.Mat shape ('S 1) ('S depth), Double) 
 thresholdImage image = CV.threshold (CV.ThreshVal_Abs 100) (CV.Thresh_Binary 255) image
 
+-- Funcion para binarizar la imagen
 threshold :: forall height0 width0 channels depth . ( depth `In` '[Word8, Float]) => M.Mat ('S '[height0, width0]) ('S 1) ('S depth) -> IO (M.Mat ('S '[height0, width0]) ('S 1) ('S depth), Double)
 threshold image = do
     thresh  <- return $ thresholdImage image     

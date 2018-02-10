@@ -1,4 +1,4 @@
-module Eval (eval, flattenResultList) where
+module Eval (eval, flattenResult) where
 
 import Types
 import Data.List
@@ -40,15 +40,15 @@ evalRes _ _ t = raise $ "Options don't match in section: " ++ t ++ "."
 
 
 -- Funciones de presentacion de resultados
-flattenResultList :: Result -> FlatResult
-flattenResultList results = concat $ map (\(res, i) -> flattenResult res i) (zip results [1..(length results)])
+flattenResult :: Result -> FlatResult
+flattenResult results = concat $ map (\(res, i) -> flattenPageResult res i) (zip results [1..(length results)])
 
-flattenResult :: PageResult -> Int -> FlatResult
-flattenResult res i = flattenResult' res [i]
+flattenPageResult :: PageResult -> Int -> FlatResult
+flattenPageResult res i = flattenPageResult' res [i]
   where
-    flattenResult' :: PageResult -> SectNum -> FlatResult
-    flattenResult' (Sect subsects) sn = concat $ map (\(s, sn) -> flattenResult' s sn) (zip subsects [i : sn | i <- [1..(length subsects)]]) 
-    flattenResult' (Ans results) sn = [(sn, map (+1) $ findIndices id results)]
+    flattenPageResult' :: PageResult -> SectNum -> FlatResult
+    flattenPageResult' (Sect subsects) sn = concat $ map (\(s, sn) -> flattenPageResult' s sn) (zip subsects [i : sn | i <- [1..(length subsects)]]) 
+    flattenPageResult' (Ans results) sn = [(sn, map (+1) $ findIndices id results)]
 
 
 -- Errores

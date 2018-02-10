@@ -3,7 +3,7 @@
 module Main where
 
 import Parser (parseDoc)
-import Eval (eval, flattenResultList)
+import Eval (eval, flattenResult)
 import System.IO 
 import PDFMaker (makePDF)
 import ImageRec (scanImage)
@@ -59,7 +59,7 @@ scan docPath imgPaths=  do
       docText <- readRes
       doc <- parseDoc docText
       results <- eval doc struct
-      return $ flattenResultList results
+      return $ flattenResult results
 
 
 catchReadFile :: FilePath -> IO (Either Error String)
