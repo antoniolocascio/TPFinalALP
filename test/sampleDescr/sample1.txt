@@ -1,5 +1,5 @@
 page
-  section ""
+  section "Page 1"
     section "Section 1.1"
       option "a) Lorem ipsum dolor sit amet, consectetur adipiscing elit."
       option "b) Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -32,7 +32,7 @@ page
 endpage
 
 page
-  section ""
+  section "Page 2"
     section "Section 2.1"
       section "Section 2.1.1"
         option "a) Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -53,7 +53,6 @@ page
         option "a) Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         option "b) Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         option "c) Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-        option "d) Lorem ipsum dolor sit amet, consectetur adipiscing elit."
       endsection
 
       section "Section 2.2.2"
