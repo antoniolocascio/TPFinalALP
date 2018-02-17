@@ -39,35 +39,35 @@ makePage page doc = drawWithPage page $ makeSection doc (upperBound - padding) (
 makeSection :: Page -> PDFFloat -> PDFFloat -> PDFFloat -> PDFFloat -> Draw ()
 makeSection (Section t (Options res opts)) upb lob leb rib = do
   let lowerLeft = leb :+ lob 
-  let upperRight = rib :+ upb
+      upperRight = rib :+ upb
   strokeColor black
   setWidth lineW
   stroke $ Graphics.PDF.Rectangle lowerLeft upperRight
   makeText t leb (upb + padding / 4)
   makeRestriction res (leb + padding / 4) (upb - (fromIntegral fontSize)) 
   let nopts = (fromIntegral $ length opts) :: PDFFloat
-  let totH = (upb - lob)
-  let optH = (totH - padding * (nopts + 1)) / nopts
-  let totW = (rib - leb)
-  let optW = totW - 4 * padding
-  let firstUpb = upb - padding 
-  let firstLeb = leb + padding
+      totH = (upb - lob)
+      optH = (totH - padding * (nopts + 1)) / nopts
+      totW = (rib - leb)
+      optW = totW - 4 * padding
+      firstUpb = upb - padding 
+      firstLeb = leb + padding
   makeOptions opts firstUpb firstLeb optH optW
 
 makeSection (Section t (Subs subs)) upb lob leb rib = do
   let lowerLeft = leb :+ lob
-  let upperRight = rib :+ upb
+      upperRight = rib :+ upb
   strokeColor black
   setWidth lineW
   stroke $ Graphics.PDF.Rectangle lowerLeft upperRight
   makeText t leb (upb + padding / 4)
   let nsubs = (fromIntegral $ length subs) :: PDFFloat
-  let totH = (upb - lob)
-  let subH = (totH - padding * (nsubs + 1)) / nsubs
-  let totW = (rib - leb)
-  let subW = totW - 2 * padding
-  let firstUpb = upb - padding 
-  let firstLeb = leb + padding
+      totH = (upb - lob)
+      subH = (totH - padding * (nsubs + 1)) / nsubs
+      totW = (rib - leb)
+      subW = totW - 2 * padding
+      firstUpb = upb - padding 
+      firstLeb = leb + padding
   makeSubsections subs firstUpb firstLeb subH subW
 
 

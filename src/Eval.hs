@@ -32,7 +32,7 @@ evalPage (Section t _) _ = raise $ generalMismatch t
 
 -- Evaluacion de opciones
 evalRes :: [Option] -> [StructPage] -> Title -> Either Error [Res]
-evalRes [opt] [Circle mked] _ = return $ [mked]
+evalRes [opt] [Circle mked] _ = return [mked]
 evalRes (opt:opts) ((Circle mked) : strs) t = do
   results <- evalRes opts strs t
   return $ mked : results

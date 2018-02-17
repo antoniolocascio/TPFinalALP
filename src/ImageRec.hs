@@ -64,6 +64,8 @@ removeSmaller :: Double -> Contorno -> Contorno
 removeSmaller totalArea (C a puntos hijos) = C a puntos (V.filter (\c -> (cArea c) > minArea) (V.map (removeSmaller totalArea) hijos))
   where minScale = 8000 
         minArea = max 200 (totalArea / minScale)
+
+
 -- Conversiones
 toStructPage :: M.Mat (CV.S [CV.D, CV.D]) CV.D CV.D -> Contorno -> StructPage
 toStructPage img c@(C _ puntos hijos) =  let n = V.length puntos 
@@ -138,7 +140,7 @@ meanIntensityCont img cnt = let v = fst $ CV.exceptError (CV.meanStdDev (CV.exce
                                 (V4 x _ _ _) = (CV.fromScalar v) :: V4 Double
                             in x
 
--- Devuelve la matriz correspondiente a el area de la imagen que contiene un contorno dado
+-- Devuelve la matriz correspondiente al area de la imagen que contiene un contorno dado
 cropFitCont :: (1 GHC.TypeLits.<= channels, channels GHC.TypeLits.<= 4) =>
   M.Mat (CV.S [height, width]) (CV.S channels) depth -> Contorno -> CV.CvExcept (CV.Mat (CV.S [CV.D, CV.D]) (CV.S channels) depth)
 cropFitCont img cont = CV.matSubRect img (fitRect $ cPuntos cont)
